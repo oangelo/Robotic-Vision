@@ -3,7 +3,6 @@
 from __future__ import print_function
 import cv2 as cv
 import argparse
-import math as m
 max_value = 255
 max_value_H = 360//2
 low_H = 0
@@ -64,79 +63,47 @@ cap = cv.VideoCapture(0)
 #cap = cv.imread(args.input)
 cv.namedWindow(window_capture_name)
 cv.namedWindow(window_detection_name)
-cv.createTrackbar(low_H_name, window_detection_name , low_H, max_value_H, on_low_H_thresh_trackbar)
-cv.createTrackbar(high_H_name, window_detection_name , high_H, max_value_H, on_high_H_thresh_trackbar)
-cv.createTrackbar(low_S_name, window_detection_name , low_S, max_value, on_low_S_thresh_trackbar)
-cv.createTrackbar(high_S_name, window_detection_name , high_S, max_value, on_high_S_thresh_trackbar)
-cv.createTrackbar(low_V_name, window_detection_name , low_V, max_value, on_low_V_thresh_trackbar)
-cv.createTrackbar(high_V_name, window_detection_name , high_V, max_value, on_high_V_thresh_trackbar)
 
-on_low_H_thresh_trackbar(82)
-on_high_H_thresh_trackbar(119)
-on_low_S_thresh_trackbar(62)
-on_high_S_thresh_trackbar(195)
-on_low_V_thresh_trackbar(111)
-on_high_V_thresh_trackbar(210)
-
-
-l = 20
-sq = int(l*m.sqrt(3)/3)
-cXs = []
-cYs = []
-cXs1 = []
-cYs1 = []
-cXs2 = []
-cYs2 = []
-def centroid(i,thresh):
-    cv.circle(thresh, (cXs[i],cYs[i]), 3, (255, 255, 255))
-    cv.line(thresh, (cXs[i] - l, cYs[i] - sq),(cXs[i] + l,cYs[i] - sq),(0,0,0))
-    cv.line(thresh, (cXs[i] + l, cYs[i] - sq),(cXs[i],cYs[i] + 2*sq),(0,0,0))
-    cv.line(thresh, (cXs[i],cYs[i] + 2*sq),(cXs[i] - l,cYs[i] - sq),(0,0,0))
-
+cv.createTrackbar(low_H_name, window_detection_name , 72, max_value_H, on_low_H_thresh_trackbar)
+cv.createTrackbar(high_H_name, window_detection_name , 91, max_value_H, on_high_H_thresh_trackbar)
+cv.createTrackbar(low_S_name, window_detection_name , 162, max_value, on_low_S_thresh_trackbar)
+cv.createTrackbar(high_S_name, window_detection_name , 255, max_value, on_high_S_thresh_trackbar)
+cv.createTrackbar(low_V_name, window_detection_name , 43, max_value, on_low_V_thresh_trackbar)
+cv.createTrackbar(high_V_name, window_detection_name , 255, max_value, on_high_V_thresh_trackbar)
+on_low_H_thresh_trackbar(72)
+on_high_H_thresh_trackbar(91)
+on_low_S_thresh_trackbar(162)
+on_high_S_thresh_trackbar(255)
+on_low_V_thresh_trackbar(43)
+on_high_V_thresh_trackbar(255)
+max_c_index = -1
 while True:
     ref, frame = cap.read()
     if frame is None:
         break
     frame_HSV = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
     frame_threshold = cv.inRange(frame_HSV, (low_H, low_S, low_V), (high_H, high_S, high_V))
-    #frame_threshold = cv.inRange(frame_HSV, (95, 102,0),(126, 197,255))
-    im2, contours, hierarchy = cv.findContours(frame_threshold,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_TC89_L1)
+    im2, contours, hierarchy  =         cv.findContours(frame_threshold,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_TC89_L1)
     if contours:
-        len_max_c = len(counters)
-        max_c_index = 0
+        len_max_c = len(contours[0])
+        max_c_index = 0;
         count = 0
-
     for c in contours:
-        
         if(len(c) > len_max_c):
             max_c_index = count
             len_max_c = len(c)
         count += 1
-
         M = cv.moments(c)
         if M["m00"] != 0 :
-            cX = int(M["m10"]/M["m00"])
-            cY = int(M["m01"]/M["m00"])
-            cXs.append(cX)
-            cYs.append(cY)
+            cX = int(M["m10"] / M["m00"])
+            cY = int(M["m01"] / M["m00"])
         else:
-            cX = 0
-            cY = 0
-            cXs.append(cX)
-            cYs.append(cY)
-
-    for i in range(len(cXs)):
-        centroid(i,frame_threshold)
-
-    cXs = []
-    cYs = []
-
+            cX, cY = 0, 0
+        cv.circle(frame_threshold, (cX, cY), 5, (0,0,0), -1)
+        cv.putText(frame_threshold, "centroid", (cX - 25, cY - 25), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0),1)
+    cv.drawContours(frame, contours,max_c_index, (0,255,0), 3)
     cv.imshow(window_capture_name, frame)
     cv.imshow(window_detection_name, frame_threshold)
-    cv.drawContours(frame,contours,max_c_index,(0,255,0),3)
-
     key = cv.waitKey(30)
     if key == ord('q') or key == 27:
         break
-
-

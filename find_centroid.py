@@ -1,8 +1,13 @@
 #!/usr/bin/python
-
 from __future__ import print_function
 import cv2 as cv
 import argparse
+import json
+
+variavel = open("dados.txt")
+lines = variavel.readlines()
+string = lines[0].strip()
+biblio = json.loads(string)
 max_value = 255
 max_value_H = 360//2
 low_H = 0
@@ -64,18 +69,18 @@ cap = cv.VideoCapture(0)
 cv.namedWindow(window_capture_name)
 cv.namedWindow(window_detection_name)
 
-cv.createTrackbar(low_H_name, window_detection_name , 72, max_value_H, on_low_H_thresh_trackbar)
-cv.createTrackbar(high_H_name, window_detection_name , 91, max_value_H, on_high_H_thresh_trackbar)
-cv.createTrackbar(low_S_name, window_detection_name , 162, max_value, on_low_S_thresh_trackbar)
-cv.createTrackbar(high_S_name, window_detection_name , 255, max_value, on_high_S_thresh_trackbar)
-cv.createTrackbar(low_V_name, window_detection_name , 43, max_value, on_low_V_thresh_trackbar)
-cv.createTrackbar(high_V_name, window_detection_name , 255, max_value, on_high_V_thresh_trackbar)
-on_low_H_thresh_trackbar(72)
-on_high_H_thresh_trackbar(91)
-on_low_S_thresh_trackbar(162)
-on_high_S_thresh_trackbar(255)
-on_low_V_thresh_trackbar(43)
-on_high_V_thresh_trackbar(255)
+cv.createTrackbar(low_H_name, window_detection_name , biblio["LH"] , max_value_H, on_low_H_thresh_trackbar)
+cv.createTrackbar(high_H_name, window_detection_name , biblio["HH"], max_value_H, on_high_H_thresh_trackbar)
+cv.createTrackbar(low_S_name, window_detection_name , biblio["LS"], max_value, on_low_S_thresh_trackbar)
+cv.createTrackbar(high_S_name, window_detection_name , biblio["HS"], max_value, on_high_S_thresh_trackbar)
+cv.createTrackbar(low_V_name, window_detection_name , biblio["LV"], max_value, on_low_V_thresh_trackbar)
+cv.createTrackbar(high_V_name, window_detection_name , biblio["HV"], max_value, on_high_V_thresh_trackbar)
+on_low_H_thresh_trackbar(biblio["LH"])
+on_high_H_thresh_trackbar(biblio["HH"])
+on_low_S_thresh_trackbar(biblio["LS"])
+on_high_S_thresh_trackbar(biblio["HS"])
+on_low_V_thresh_trackbar(biblio["LV"])
+on_high_V_thresh_trackbar(biblio["HV"])
 max_c_index = -1
 while True:
     ref, frame = cap.read()

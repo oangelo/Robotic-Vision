@@ -88,7 +88,7 @@ while True:
         break
     frame_HSV = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
     frame_threshold = cv.inRange(frame_HSV, (low_H, low_S, low_V), (high_H, high_S, high_V))
-    im2, contours, hierarchy  =         cv.findContours(frame_threshold,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_TC89_L1)
+    im2, contours, hierarchy  =  cv.findContours(frame_threshold,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_TC89_L1)
     if contours:
         len_max_c = len(contours[0])
         max_c_index = 0;
@@ -104,6 +104,7 @@ while True:
             cY = int(M["m01"] / M["m00"])
         else:
             cX, cY = 0, 0
+
         cv.circle(frame_threshold, (cX, cY), 5, (0,0,0), -1)
         cv.putText(frame_threshold, "centroid", (cX - 25, cY - 25), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0),1)
     cv.drawContours(frame, contours,max_c_index, (0,255,0), 3)

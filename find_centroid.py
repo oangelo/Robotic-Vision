@@ -88,7 +88,11 @@ while True:
         break
     frame_HSV = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
     frame_threshold = cv.inRange(frame_HSV, (low_H, low_S, low_V), (high_H, high_S, high_V))
+<<<<<<< HEAD
     im2, contours, hierarchy  =  cv.findContours(frame_threshold,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_TC89_L1)
+=======
+    contours, hierarchy  = cv.findContours(frame_threshold,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_TC89_L1)
+>>>>>>> 901590ed4f68be69d73b5349a5063f912641ad28
     if contours:
         len_max_c = len(contours[0])
         max_c_index = 0;

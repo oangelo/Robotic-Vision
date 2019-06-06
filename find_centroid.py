@@ -1,13 +1,17 @@
 #!/usr/bin/python
 from __future__ import print_function
+from centroid_color import CentroidColor
 import cv2 as cv
 import argparse
 import json
+
 
 variavel = open("dados.txt")
 lines = variavel.readlines()
 string = lines[0].strip()
 biblio = json.loads(string)
+color1 = CentroidColor(biblio)
+color2 = CentroidColor(biblio)
 max_value = 255
 max_value_H = 360//2
 low_H = 0
@@ -86,32 +90,11 @@ while True:
     ref, frame = cap.read()
     if frame is None:
         break
-    frame_HSV = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-    frame_threshold = cv.inRange(frame_HSV, (low_H, low_S, low_V), (high_H, high_S, high_V))
-<<<<<<< HEAD
-    im2, contours, hierarchy  =  cv.findContours(frame_threshold,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_TC89_L1)
-=======
-    contours, hierarchy  = cv.findContours(frame_threshold,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_TC89_L1)
->>>>>>> 901590ed4f68be69d73b5349a5063f912641ad28
-    if contours:
-        len_max_c = len(contours[0])
-        max_c_index = 0;
-        count = 0
-    for c in contours:
-        if(len(c) > len_max_c):
-            max_c_index = count
-            len_max_c = len(c)
-        count += 1
-        M = cv.moments(c)
-        if M["m00"] != 0 :
-            cX = int(M["m10"] / M["m00"])
-            cY = int(M["m01"] / M["m00"])
-        else:
-            cX, cY = 0, 0
-
+    cX, cY = color1.get_centroid(frame)
+    frame_threshold = color1.get_frame_threshold(frame)
+    if(cX is not None and cY is not None):
         cv.circle(frame_threshold, (cX, cY), 5, (0,0,0), -1)
         cv.putText(frame_threshold, "centroid", (cX - 25, cY - 25), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0),1)
-    cv.drawContours(frame, contours,max_c_index, (0,255,0), 3)
     cv.imshow(window_capture_name, frame)
     cv.imshow(window_detection_name, frame_threshold)
     key = cv.waitKey(30)
